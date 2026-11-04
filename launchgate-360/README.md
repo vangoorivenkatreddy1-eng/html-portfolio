@@ -44,7 +44,9 @@ Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard). The **D
 | Travel | `/operations/travel` — passengers vs flight segments, exceptions |
 | Hotels | `/operations/hotels` — room nights, blocks, vendor refs, allocations |
 | Transport | `/operations/transport` — route assignments, seats, vehicle when booked |
-| Other operations workspaces | `/operations/*` (venue, vehicles, master plan stubs) |
+| Venue | `/operations/venue` — capacity, contract, permits, stage/AV milestones |
+| Launch vehicles | `/operations/vehicles` — units, inspection readiness, blockers |
+| Master plan & risks | `/operations/master-plan` — pillars, six phases, dependencies |
 | Settings (launch date) | `/settings` |
 | Executive PDF | `GET /api/reports/executive` |
 

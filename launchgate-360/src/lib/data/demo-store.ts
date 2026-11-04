@@ -172,6 +172,13 @@ export function getDemoTransactionBundle(): TransactionBundle {
         capacity: 1200,
         expected_attendance: 850,
         contract_status: "signed",
+        event_start: "2026-09-14",
+        event_end: "2026-09-15",
+        permits_status: "in_review",
+        stage_av_milestones: [
+          { title: "Stage load-in", status: "scheduled", due_date: "2026-09-10" },
+          { title: "AV rehearsal", status: "pending", due_date: "2026-09-13" },
+        ],
       },
     ],
     budgetLines: [
@@ -243,6 +250,78 @@ export function getDemoTransactionBundle(): TransactionBundle {
         critical_blocker: "PDI pending",
       },
     ],
+    planPhases: [
+      {
+        id: "phase-1",
+        launch_id: DEMO_LAUNCH_ID,
+        phase_number: 1,
+        name: "Charter & Governance",
+        pillar: "planning_governance",
+        target_date: "2026-03-01",
+        status: "in_progress",
+      },
+      {
+        id: "phase-2",
+        launch_id: DEMO_LAUNCH_ID,
+        phase_number: 2,
+        name: "Stakeholder Mapping",
+        pillar: "people_event_operations",
+        target_date: "2026-04-01",
+        status: "in_progress",
+      },
+      {
+        id: "phase-3",
+        launch_id: DEMO_LAUNCH_ID,
+        phase_number: 3,
+        name: "Travel & Hospitality",
+        pillar: "people_event_operations",
+        target_date: "2026-06-01",
+        status: "not_started",
+      },
+      {
+        id: "phase-4",
+        launch_id: DEMO_LAUNCH_ID,
+        phase_number: 4,
+        name: "Venue & Experience",
+        pillar: "people_event_operations",
+        target_date: "2026-07-01",
+        status: "not_started",
+      },
+      {
+        id: "phase-5",
+        launch_id: DEMO_LAUNCH_ID,
+        phase_number: 5,
+        name: "Vehicle Readiness",
+        pillar: "vehicle_commercial_readiness",
+        target_date: "2026-08-01",
+        status: "not_started",
+      },
+      {
+        id: "phase-6",
+        launch_id: DEMO_LAUNCH_ID,
+        phase_number: 6,
+        name: "Launch Week Execution",
+        pillar: "vehicle_commercial_readiness",
+        target_date: "2026-09-15",
+        status: "not_started",
+      },
+    ],
+    planDependencies: [
+      {
+        id: "dep-1",
+        launch_id: DEMO_LAUNCH_ID,
+        predecessor_phase_id: "phase-1",
+        successor_phase_id: "phase-2",
+        description: "Governance charter before stakeholder mapping",
+      },
+      {
+        id: "dep-2",
+        launch_id: DEMO_LAUNCH_ID,
+        predecessor_phase_id: "phase-5",
+        successor_phase_id: "phase-6",
+        description: "Vehicle readiness before launch week",
+      },
+    ],
   };
 }
 
@@ -255,6 +334,10 @@ let demoTravelPassengers = getDemoTransactionBundle().travelPassengers;
 let demoFlightSegments = getDemoTransactionBundle().flightSegments;
 let demoHotelRooms = getDemoTransactionBundle().hotelRooms;
 let demoTransport = getDemoTransactionBundle().transport;
+let demoVenues = getDemoTransactionBundle().venues;
+let demoVehicles = getDemoTransactionBundle().vehicles;
+let demoPlanPhases = getDemoTransactionBundle().planPhases;
+let demoPlanDependencies = getDemoTransactionBundle().planDependencies;
 
 export function getDemoTransactionBundleForLaunch(): import("@/lib/types/domain").TransactionBundle {
   const base = getDemoTransactionBundle();
@@ -269,7 +352,27 @@ export function getDemoTransactionBundleForLaunch(): import("@/lib/types/domain"
     flightSegments: getDemoFlightSegments(),
     hotelRooms: getDemoHotelRooms(),
     transport: getDemoTransport(),
+    venues: getDemoVenues(),
+    vehicles: getDemoVehicles(),
+    planPhases: getDemoPlanPhases(),
+    planDependencies: getDemoPlanDependencies(),
   };
+}
+
+export function getDemoVenues() {
+  return [...demoVenues];
+}
+
+export function getDemoVehicles() {
+  return [...demoVehicles];
+}
+
+export function getDemoPlanPhases() {
+  return [...demoPlanPhases];
+}
+
+export function getDemoPlanDependencies() {
+  return [...demoPlanDependencies];
 }
 
 export function getDemoTravelPassengers() {
@@ -371,6 +474,10 @@ export function resetDemoStore() {
   demoFlightSegments = fresh.flightSegments;
   demoHotelRooms = fresh.hotelRooms;
   demoTransport = fresh.transport;
+  demoVenues = fresh.venues;
+  demoVehicles = fresh.vehicles;
+  demoPlanPhases = fresh.planPhases;
+  demoPlanDependencies = fresh.planDependencies;
 }
 
 function parseAmount(value: FormDataEntryValue | null): number {
@@ -613,6 +720,125 @@ export function demoUpsertTransport(input: {
 
 export function demoDeleteTransport(id: string) {
   demoTransport = demoTransport.filter((t) => t.id !== id);
+}
+
+export function demoUpsertVenue(input: {
+  id?: string;
+  venue_name: string;
+  capacity: number;
+  expected_attendance: number;
+  contract_status: string;
+  event_start?: string | null;
+  event_end?: string | null;
+  permits_status: string;
+  stage_av_milestones: import("@/lib/types/domain").StageAvMilestone[];
+}) {
+  if (input.id) {
+    demoVenues = demoVenues.map((v) =>
+      v.id === input.id ? { ...v, ...input, launch_id: DEMO_LAUNCH_ID } : v,
+    );
+    return demoVenues.find((v) => v.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    event_start: input.event_start ?? null,
+    event_end: input.event_end ?? null,
+    ...input,
+  };
+  demoVenues = [...demoVenues, created];
+  return created;
+}
+
+export function demoDeleteVenue(id: string) {
+  demoVenues = demoVenues.filter((v) => v.id !== id);
+}
+
+export function demoUpsertVehicle(input: {
+  id?: string;
+  unit_name: string;
+  required_for_launch: boolean;
+  inspection_ready: boolean;
+  critical_blocker?: string | null;
+}) {
+  if (input.id) {
+    demoVehicles = demoVehicles.map((v) =>
+      v.id === input.id ? { ...v, ...input, launch_id: DEMO_LAUNCH_ID } : v,
+    );
+    return demoVehicles.find((v) => v.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    critical_blocker: input.critical_blocker ?? null,
+    ...input,
+  };
+  demoVehicles = [...demoVehicles, created];
+  return created;
+}
+
+export function demoDeleteVehicle(id: string) {
+  demoVehicles = demoVehicles.filter((v) => v.id !== id);
+}
+
+export function demoUpsertPlanPhase(input: {
+  id?: string;
+  phase_number: number;
+  name: string;
+  pillar: import("@/lib/types/domain").PlanPillar;
+  target_date?: string | null;
+  status: string;
+}) {
+  if (input.id) {
+    demoPlanPhases = demoPlanPhases.map((p) =>
+      p.id === input.id ? { ...p, ...input, launch_id: DEMO_LAUNCH_ID } : p,
+    );
+    return demoPlanPhases.find((p) => p.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    target_date: input.target_date ?? null,
+    ...input,
+  };
+  demoPlanPhases = [...demoPlanPhases, created];
+  return created;
+}
+
+export function demoDeletePlanPhase(id: string) {
+  demoPlanPhases = demoPlanPhases.filter((p) => p.id !== id);
+  demoPlanDependencies = demoPlanDependencies.filter(
+    (d) => d.predecessor_phase_id !== id && d.successor_phase_id !== id,
+  );
+}
+
+export function demoUpsertPlanDependency(input: {
+  id?: string;
+  predecessor_phase_id: string;
+  successor_phase_id: string;
+  description?: string | null;
+}) {
+  if (input.predecessor_phase_id === input.successor_phase_id) {
+    throw new Error("A phase cannot depend on itself.");
+  }
+  if (input.id) {
+    demoPlanDependencies = demoPlanDependencies.map((d) =>
+      d.id === input.id ? { ...d, ...input, launch_id: DEMO_LAUNCH_ID } : d,
+    );
+    return demoPlanDependencies.find((d) => d.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    description: input.description ?? null,
+    ...input,
+  };
+  demoPlanDependencies = [...demoPlanDependencies, created];
+  return created;
+}
+
+export function demoDeletePlanDependency(id: string) {
+  demoPlanDependencies = demoPlanDependencies.filter((d) => d.id !== id);
 }
 
 export { parseAmount };

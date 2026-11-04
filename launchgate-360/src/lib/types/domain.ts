@@ -132,6 +132,39 @@ export interface VenueRecord {
   capacity: number;
   expected_attendance: number;
   contract_status: string;
+  event_start: string | null;
+  event_end: string | null;
+  permits_status: string;
+  stage_av_milestones: StageAvMilestone[];
+}
+
+export interface StageAvMilestone {
+  title: string;
+  status: string;
+  due_date?: string | null;
+}
+
+export type PlanPillar =
+  | "planning_governance"
+  | "people_event_operations"
+  | "vehicle_commercial_readiness";
+
+export interface PlanPhase {
+  id: string;
+  launch_id: string;
+  phase_number: number;
+  name: string;
+  pillar: PlanPillar;
+  target_date: string | null;
+  status: string;
+}
+
+export interface PlanDependency {
+  id: string;
+  launch_id: string;
+  predecessor_phase_id: string;
+  successor_phase_id: string;
+  description: string | null;
 }
 
 export interface BudgetLine {
@@ -257,4 +290,6 @@ export interface TransactionBundle {
   prs: PurchaseRequisition[];
   pos: PurchaseOrder[];
   vehicles: LaunchVehicleUnit[];
+  planPhases: PlanPhase[];
+  planDependencies: PlanDependency[];
 }

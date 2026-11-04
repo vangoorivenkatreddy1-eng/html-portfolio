@@ -66,6 +66,8 @@ export async function getTransactionBundle(
     prs,
     pos,
     vehicles,
+    planPhases,
+    planDependencies,
   ] = await Promise.all([
     supabase.from("stakeholders").select("*").eq("launch_id", launchId),
     supabase.from("invitations").select("*").eq("launch_id", launchId),
@@ -78,6 +80,8 @@ export async function getTransactionBundle(
     supabase.from("purchase_requisitions").select("*").eq("launch_id", launchId),
     supabase.from("purchase_orders").select("*").eq("launch_id", launchId),
     supabase.from("launch_vehicle_units").select("*").eq("launch_id", launchId),
+    supabase.from("plan_phases").select("*").eq("launch_id", launchId).order("phase_number"),
+    supabase.from("plan_dependencies").select("*").eq("launch_id", launchId),
   ]);
 
   const firstError =
@@ -91,7 +95,9 @@ export async function getTransactionBundle(
     budgetLines.error ||
     prs.error ||
     pos.error ||
-    vehicles.error;
+    vehicles.error ||
+    planPhases.error ||
+    planDependencies.error;
   if (firstError) throw new Error(firstError.message);
 
   return {
@@ -107,6 +113,8 @@ export async function getTransactionBundle(
     prs: prs.data ?? [],
     pos: pos.data ?? [],
     vehicles: vehicles.data ?? [],
+    planPhases: planPhases.data ?? [],
+    planDependencies: planDependencies.data ?? [],
   };
 }
 

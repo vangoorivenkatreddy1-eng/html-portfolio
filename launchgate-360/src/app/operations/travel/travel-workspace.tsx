@@ -64,6 +64,8 @@ export function TravelWorkspace({
     prs: [],
     pos: [],
     vehicles: [],
+    planPhases: [],
+    planDependencies: [],
   };
   const kpis = aggregateExecutiveKpis(bundle);
 

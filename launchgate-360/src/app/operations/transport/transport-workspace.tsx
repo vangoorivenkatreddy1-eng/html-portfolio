@@ -61,6 +61,8 @@ export function TransportWorkspace({
     prs: [],
     pos: [],
     vehicles: [],
+    planPhases: [],
+    planDependencies: [],
   } satisfies TransactionBundle);
 
   function run(action: () => Promise<{ ok?: boolean; error?: unknown }>, msg: string) {

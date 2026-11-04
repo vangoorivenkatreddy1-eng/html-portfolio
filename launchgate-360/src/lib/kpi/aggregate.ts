@@ -125,6 +125,11 @@ export function aggregateExecutiveKpis(data: TransactionBundle): ExecutiveKpis {
       "Expected attendance exceeds venue capacity on record.",
     );
   }
+  if (data.venues.length > 1) {
+    inconsistencies.push(
+      "Multiple venue records exist; executive KPIs reflect the first venue only.",
+    );
+  }
 
   const budgetRequested = data.budgetLines.reduce(
     (s, b) => s + Number(b.amount_requested),
