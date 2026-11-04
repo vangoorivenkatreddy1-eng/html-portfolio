@@ -1,10 +1,32 @@
-import { WorkspacePlaceholder } from "@/components/operations/workspace-placeholder";
+import { connection } from "next/server";
+import { canEditDomain } from "@/lib/kpi/aggregate";
+import {
+  getActiveLaunch,
+  getCurrentMembership,
+  getTransactionBundle,
+  isDemoMode,
+} from "@/lib/data/launch-service";
+import { TransportWorkspace } from "./transport-workspace";
 
-export default function TransportPage() {
+export const instant = false;
+
+export default async function TransportPage() {
+  await connection();
+  const launch = await getActiveLaunch();
+  const bundle = await getTransactionBundle(launch.id);
+  const membership = await getCurrentMembership(launch.id);
+  const canEdit =
+    isDemoMode() ||
+    (membership !== null &&
+      (membership.role === "pmo_admin" ||
+        canEditDomain(membership.role, membership.assigned_domains, "transport")));
+
   return (
-    <WorkspacePlaceholder
-      title="Transport"
-      description="Cab/vehicle assignments, routes, seats, and pickups — not mixed with trip counts."
+    <TransportWorkspace
+      launch={bundle.launch}
+      assignments={bundle.transport}
+      isDemo={bundle.launch.is_demo}
+      canEdit={canEdit}
     />
   );
 }

@@ -94,7 +94,7 @@ export function aggregateExecutiveKpis(data: TransactionBundle): ExecutiveKpis {
   ).length;
   const roomBlocks = new Set(
     data.hotelRooms
-      .map((r) => r.room_label.split("-")[0])
+      .map((r) => r.room_block_name ?? r.room_label.split("-")[0])
       .filter(Boolean),
   ).size;
   const roomPendingAllocation = data.hotelRooms.filter(

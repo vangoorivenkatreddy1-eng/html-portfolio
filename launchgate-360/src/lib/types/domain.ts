@@ -85,24 +85,34 @@ export interface Invitation {
 export interface TravelPassenger {
   id: string;
   launch_id: string;
+  stakeholder_id?: string | null;
   passenger_name: string;
   needs_flight: boolean;
   has_exception: boolean;
+  exception_notes?: string | null;
 }
 
 export interface FlightSegment {
   id: string;
   launch_id: string;
   passenger_id: string;
+  origin: string;
+  destination: string;
   status: FlightSegmentStatus;
+  booking_reference?: string | null;
 }
 
 export interface HotelRoomNight {
   id: string;
   launch_id: string;
   room_label: string;
+  room_block_name: string | null;
   nights_required: number;
   status: HotelRoomStatus;
+  vendor_confirmation_ref: string | null;
+  check_in: string | null;
+  check_out: string | null;
+  allocated_to: string | null;
 }
 
 export interface TransportAssignment {
@@ -111,6 +121,7 @@ export interface TransportAssignment {
   route_name: string;
   vehicle_label: string | null;
   passenger_seats_required: number;
+  pickup_at: string | null;
   status: TransportAssignmentStatus;
 }
 

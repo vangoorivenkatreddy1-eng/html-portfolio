@@ -41,7 +41,10 @@ Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard). The **D
 | Executive dashboard | `/dashboard` |
 | Stakeholders & invitations | `/operations/stakeholders` |
 | Budget & procurement | `/operations/budget` — budget lines, PR/PO records, approval workflows |
-| Other operations workspaces | `/operations/*` (stubs; schema ready) |
+| Travel | `/operations/travel` — passengers vs flight segments, exceptions |
+| Hotels | `/operations/hotels` — room nights, blocks, vendor refs, allocations |
+| Transport | `/operations/transport` — route assignments, seats, vehicle when booked |
+| Other operations workspaces | `/operations/*` (venue, vehicles, master plan stubs) |
 | Settings (launch date) | `/settings` |
 | Executive PDF | `GET /api/reports/executive` |
 

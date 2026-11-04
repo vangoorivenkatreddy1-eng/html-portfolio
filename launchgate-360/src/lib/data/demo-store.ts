@@ -87,6 +87,7 @@ export function getDemoTransactionBundle(): TransactionBundle {
         passenger_name: "Anita Desai",
         needs_flight: true,
         has_exception: false,
+        exception_notes: null,
       },
       {
         id: "tp-2",
@@ -94,6 +95,7 @@ export function getDemoTransactionBundle(): TransactionBundle {
         passenger_name: "Rahul Mehta",
         needs_flight: true,
         has_exception: false,
+        exception_notes: null,
       },
     ],
     flightSegments: [
@@ -101,13 +103,19 @@ export function getDemoTransactionBundle(): TransactionBundle {
         id: "fs-1",
         launch_id: DEMO_LAUNCH_ID,
         passenger_id: "tp-1",
+        origin: "DEL",
+        destination: "BOM",
         status: "confirmed",
+        booking_reference: "DEMO-PNR-001",
       },
       {
         id: "fs-2",
         launch_id: DEMO_LAUNCH_ID,
         passenger_id: "tp-2",
+        origin: "BLR",
+        destination: "BOM",
         status: "pending",
+        booking_reference: null,
       },
     ],
     hotelRooms: [
@@ -115,15 +123,25 @@ export function getDemoTransactionBundle(): TransactionBundle {
         id: "hr-1",
         launch_id: DEMO_LAUNCH_ID,
         room_label: "King-101",
+        room_block_name: "Tower Block A",
         nights_required: 3,
         status: "confirmed",
+        vendor_confirmation_ref: "DEMO-VENDOR-REF-001",
+        check_in: "2026-09-13",
+        check_out: "2026-09-16",
+        allocated_to: "Anita Desai",
       },
       {
         id: "hr-2",
         launch_id: DEMO_LAUNCH_ID,
         room_label: "Twin-204",
+        room_block_name: "Tower Block A",
         nights_required: 2,
         status: "pending_allocation",
+        vendor_confirmation_ref: null,
+        check_in: null,
+        check_out: null,
+        allocated_to: null,
       },
     ],
     transport: [
@@ -133,6 +151,7 @@ export function getDemoTransactionBundle(): TransactionBundle {
         route_name: "Airport to Hotel",
         vehicle_label: "SUV-01",
         passenger_seats_required: 3,
+        pickup_at: "2026-09-13T14:00:00Z",
         status: "confirmed",
       },
       {
@@ -141,6 +160,7 @@ export function getDemoTransactionBundle(): TransactionBundle {
         route_name: "Hotel to Venue",
         vehicle_label: null,
         passenger_seats_required: 4,
+        pickup_at: null,
         status: "required",
       },
     ],
@@ -231,6 +251,10 @@ let demoInvitations = getDemoTransactionBundle().invitations;
 let demoBudgetLines = getDemoTransactionBundle().budgetLines;
 let demoPrs = getDemoTransactionBundle().prs;
 let demoPos = getDemoTransactionBundle().pos;
+let demoTravelPassengers = getDemoTransactionBundle().travelPassengers;
+let demoFlightSegments = getDemoTransactionBundle().flightSegments;
+let demoHotelRooms = getDemoTransactionBundle().hotelRooms;
+let demoTransport = getDemoTransactionBundle().transport;
 
 export function getDemoTransactionBundleForLaunch(): import("@/lib/types/domain").TransactionBundle {
   const base = getDemoTransactionBundle();
@@ -241,7 +265,27 @@ export function getDemoTransactionBundleForLaunch(): import("@/lib/types/domain"
     budgetLines: getDemoBudgetLines(),
     prs: getDemoPrs(),
     pos: getDemoPos(),
+    travelPassengers: getDemoTravelPassengers(),
+    flightSegments: getDemoFlightSegments(),
+    hotelRooms: getDemoHotelRooms(),
+    transport: getDemoTransport(),
   };
+}
+
+export function getDemoTravelPassengers() {
+  return [...demoTravelPassengers];
+}
+
+export function getDemoFlightSegments() {
+  return [...demoFlightSegments];
+}
+
+export function getDemoHotelRooms() {
+  return [...demoHotelRooms];
+}
+
+export function getDemoTransport() {
+  return [...demoTransport];
 }
 
 export function getDemoBudgetLines() {
@@ -323,6 +367,10 @@ export function resetDemoStore() {
   demoBudgetLines = fresh.budgetLines;
   demoPrs = fresh.prs;
   demoPos = fresh.pos;
+  demoTravelPassengers = fresh.travelPassengers;
+  demoFlightSegments = fresh.flightSegments;
+  demoHotelRooms = fresh.hotelRooms;
+  demoTransport = fresh.transport;
 }
 
 function parseAmount(value: FormDataEntryValue | null): number {
@@ -445,6 +493,126 @@ export function demoTransitionPo(id: string, to: import("@/lib/types/domain").Po
 
 export function demoDeletePo(id: string) {
   demoPos = demoPos.filter((p) => p.id !== id);
+}
+
+export function demoUpsertTravelPassenger(input: {
+  id?: string;
+  passenger_name: string;
+  needs_flight: boolean;
+  has_exception: boolean;
+  exception_notes?: string | null;
+}) {
+  if (input.id) {
+    demoTravelPassengers = demoTravelPassengers.map((p) =>
+      p.id === input.id ? { ...p, ...input, launch_id: DEMO_LAUNCH_ID } : p,
+    );
+    return demoTravelPassengers.find((p) => p.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    exception_notes: input.exception_notes ?? null,
+    ...input,
+  };
+  demoTravelPassengers = [...demoTravelPassengers, created];
+  return created;
+}
+
+export function demoDeleteTravelPassenger(id: string) {
+  demoTravelPassengers = demoTravelPassengers.filter((p) => p.id !== id);
+  demoFlightSegments = demoFlightSegments.filter((s) => s.passenger_id !== id);
+}
+
+export function demoUpsertFlightSegment(input: {
+  id?: string;
+  passenger_id: string;
+  origin: string;
+  destination: string;
+  status: import("@/lib/types/domain").FlightSegmentStatus;
+  booking_reference?: string | null;
+}) {
+  if (input.id) {
+    demoFlightSegments = demoFlightSegments.map((s) =>
+      s.id === input.id ? { ...s, ...input, launch_id: DEMO_LAUNCH_ID } : s,
+    );
+    return demoFlightSegments.find((s) => s.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    booking_reference: input.booking_reference ?? null,
+    ...input,
+  };
+  demoFlightSegments = [...demoFlightSegments, created];
+  return created;
+}
+
+export function demoDeleteFlightSegment(id: string) {
+  demoFlightSegments = demoFlightSegments.filter((s) => s.id !== id);
+}
+
+export function demoUpsertHotelRoom(input: {
+  id?: string;
+  room_label: string;
+  room_block_name?: string | null;
+  nights_required: number;
+  status: import("@/lib/types/domain").HotelRoomStatus;
+  vendor_confirmation_ref?: string | null;
+  check_in?: string | null;
+  check_out?: string | null;
+  allocated_to?: string | null;
+}) {
+  if (input.id) {
+    demoHotelRooms = demoHotelRooms.map((r) =>
+      r.id === input.id ? { ...r, ...input, launch_id: DEMO_LAUNCH_ID } : r,
+    );
+    return demoHotelRooms.find((r) => r.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    room_block_name: input.room_block_name ?? null,
+    vendor_confirmation_ref: input.vendor_confirmation_ref ?? null,
+    check_in: input.check_in ?? null,
+    check_out: input.check_out ?? null,
+    allocated_to: input.allocated_to ?? null,
+    ...input,
+  };
+  demoHotelRooms = [...demoHotelRooms, created];
+  return created;
+}
+
+export function demoDeleteHotelRoom(id: string) {
+  demoHotelRooms = demoHotelRooms.filter((r) => r.id !== id);
+}
+
+export function demoUpsertTransport(input: {
+  id?: string;
+  route_name: string;
+  vehicle_label?: string | null;
+  passenger_seats_required: number;
+  pickup_at?: string | null;
+  status: import("@/lib/types/domain").TransportAssignmentStatus;
+}) {
+  if (input.id) {
+    demoTransport = demoTransport.map((t) =>
+      t.id === input.id ? { ...t, ...input, launch_id: DEMO_LAUNCH_ID } : t,
+    );
+    return demoTransport.find((t) => t.id === input.id)!;
+  }
+  const created = {
+    id: crypto.randomUUID(),
+    launch_id: DEMO_LAUNCH_ID,
+    vehicle_label: input.vehicle_label ?? null,
+    pickup_at: input.pickup_at ?? null,
+    ...input,
+  };
+  demoTransport = [...demoTransport, created];
+  return created;
+}
+
+export function demoDeleteTransport(id: string) {
+  demoTransport = demoTransport.filter((t) => t.id !== id);
 }
 
 export { parseAmount };
