@@ -40,6 +40,7 @@ Open [http://localhost:3000/dashboard](http://localhost:3000/dashboard). The **D
 | --- | --- |
 | Executive dashboard | `/dashboard` |
 | Stakeholders & invitations | `/operations/stakeholders` |
+| Budget & procurement | `/operations/budget` — budget lines, PR/PO records, approval workflows |
 | Other operations workspaces | `/operations/*` (stubs; schema ready) |
 | Settings (launch date) | `/settings` |
 | Executive PDF | `GET /api/reports/executive` |

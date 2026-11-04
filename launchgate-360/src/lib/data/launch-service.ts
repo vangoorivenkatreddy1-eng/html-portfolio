@@ -1,4 +1,4 @@
-import { DEMO_LAUNCH_ID, getDemoTransactionBundle } from "@/lib/data/demo-store";
+import { DEMO_LAUNCH_ID, getDemoTransactionBundle, getDemoTransactionBundleForLaunch } from "@/lib/data/demo-store";
 import type {
   ExecutiveReportSnapshot,
   Launch,
@@ -41,7 +41,7 @@ export async function getTransactionBundle(
   launchId: string,
 ): Promise<TransactionBundle> {
   if (isDemoMode() && launchId === DEMO_LAUNCH_ID) {
-    return getDemoTransactionBundle();
+    return getDemoTransactionBundleForLaunch();
   }
   const { createClient } = await import("@/lib/supabase/server");
   const supabase = await createClient();

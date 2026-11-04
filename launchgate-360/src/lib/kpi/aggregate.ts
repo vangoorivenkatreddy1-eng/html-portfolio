@@ -144,6 +144,10 @@ export function aggregateExecutiveKpis(data: TransactionBundle): ExecutiveKpis {
   );
   const budgetCurrency = data.launch.currency;
 
+  if (budgetCommitted > budgetApproved && budgetApproved > 0) {
+    inconsistencies.push("Budget committed exceeds approved totals on one or more lines.");
+  }
+
   const prCounts = emptyPrCounts();
   for (const pr of data.prs) {
     prCounts[pr.status] += 1;

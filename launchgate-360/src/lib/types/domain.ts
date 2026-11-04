@@ -126,12 +126,14 @@ export interface VenueRecord {
 export interface BudgetLine {
   id: string;
   launch_id: string;
+  category: string;
   currency: string;
   amount_requested: number;
   amount_approved: number;
   amount_committed: number;
   amount_actual: number;
   approval_status: string;
+  owner_name: string | null;
 }
 
 export interface PurchaseRequisition {
@@ -140,6 +142,10 @@ export interface PurchaseRequisition {
   pr_number: string;
   status: PrStatus;
   amount: number;
+  currency: string;
+  owner_name: string | null;
+  vendor_name: string | null;
+  raised_at: string | null;
 }
 
 export interface PurchaseOrder {
@@ -148,6 +154,10 @@ export interface PurchaseOrder {
   po_number: string;
   status: PoStatus;
   amount: number;
+  currency: string;
+  owner_name: string | null;
+  vendor_name: string | null;
+  pr_id: string | null;
 }
 
 export interface LaunchVehicleUnit {
