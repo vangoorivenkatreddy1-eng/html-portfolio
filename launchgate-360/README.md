@@ -62,7 +62,9 @@ npm test
 
 ## Deploy (Vercel)
 
-Set root directory to `launchgate-360`, add Supabase env vars, and deploy. Ensure migrations and DEMO-labeled seed are applied only to non-production environments.
+See **[docs/DEPLOY.md](docs/DEPLOY.md)** for Supabase Auth URLs, environment variables, membership seeding, and a post-deploy checklist.
+
+Summary: set root directory to `launchgate-360`, configure `NEXT_PUBLIC_SUPABASE_*`, set `LAUNCHGATE_DEMO_MODE=false` in production, and run `seed-production-memberships.sql.example` after creating Auth users.
 
 ## Note on reference UI
 
