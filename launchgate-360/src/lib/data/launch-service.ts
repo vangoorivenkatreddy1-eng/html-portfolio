@@ -1,4 +1,8 @@
-import { DEMO_LAUNCH_ID, getDemoTransactionBundle, getDemoTransactionBundleForLaunch } from "@/lib/data/demo-store";
+import {
+  DEMO_LAUNCH_ID,
+  getDemoLaunch,
+  getDemoTransactionBundleForLaunch,
+} from "@/lib/data/demo-store";
 import type {
   ExecutiveReportSnapshot,
   Launch,
@@ -21,7 +25,7 @@ export function isDemoMode(): boolean {
 
 export async function getActiveLaunch(): Promise<Launch> {
   if (isDemoMode()) {
-    return getDemoTransactionBundle().launch;
+    return getDemoLaunch();
   }
   const { createClient } = await import("@/lib/supabase/server");
   const supabase = await createClient();

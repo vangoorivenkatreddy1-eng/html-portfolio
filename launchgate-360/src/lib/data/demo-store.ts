@@ -338,11 +338,23 @@ let demoVenues = getDemoTransactionBundle().venues;
 let demoVehicles = getDemoTransactionBundle().vehicles;
 let demoPlanPhases = getDemoTransactionBundle().planPhases;
 let demoPlanDependencies = getDemoTransactionBundle().planDependencies;
+let demoLaunchDateOverride: string | null = null;
+
+export function getDemoLaunch(): import("@/lib/types/domain").Launch {
+  const base = getDemoTransactionBundle().launch;
+  if (!demoLaunchDateOverride) return base;
+  return { ...base, launch_date: demoLaunchDateOverride };
+}
+
+export function demoUpdateLaunchDate(launch_date: string) {
+  demoLaunchDateOverride = launch_date;
+}
 
 export function getDemoTransactionBundleForLaunch(): import("@/lib/types/domain").TransactionBundle {
   const base = getDemoTransactionBundle();
   return {
     ...base,
+    launch: getDemoLaunch(),
     stakeholders: getDemoStakeholders(),
     invitations: getDemoInvitations(),
     budgetLines: getDemoBudgetLines(),
@@ -478,6 +490,7 @@ export function resetDemoStore() {
   demoVehicles = fresh.vehicles;
   demoPlanPhases = fresh.planPhases;
   demoPlanDependencies = fresh.planDependencies;
+  demoLaunchDateOverride = null;
 }
 
 function parseAmount(value: FormDataEntryValue | null): number {

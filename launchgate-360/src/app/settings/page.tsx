@@ -3,18 +3,20 @@ import { AppShell } from "@/components/layout/app-shell";
 import { DemoBanner } from "@/components/demo-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignOutButton } from "@/components/layout/sign-out-button";
+import { canEditLaunchMaster } from "@/lib/auth/launch-master";
 import { getCurrentMembership, getActiveLaunch, isDemoMode } from "@/lib/data/launch-service";
 import { resolveReportingCadenceFromLaunch } from "@/lib/data/settings-service";
+import { LaunchDateForm } from "./launch-date-form";
+import { getDemoLaunch } from "@/lib/data/demo-store";
 
 export const instant = false;
 
 export default async function SettingsPage() {
   await connection();
-  const launch = isDemoMode()
-    ? (await import("@/lib/data/demo-store")).getDemoTransactionBundle().launch
-    : await getActiveLaunch();
+  const launch = isDemoMode() ? getDemoLaunch() : await getActiveLaunch();
   const cadence = resolveReportingCadenceFromLaunch(launch);
   const membership = isDemoMode() ? null : await getCurrentMembership(launch.id);
+  const canEditLaunch = canEditLaunchMaster(membership);
 
   return (
     <AppShell title="Settings" subtitle="Launch master configuration">
@@ -26,10 +28,8 @@ export default async function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Launch date &amp; reporting</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-slate-700">
-          <p>
-            <span className="font-medium">Launch date:</span> {launch.launch_date}
-          </p>
+        <CardContent className="space-y-4 text-sm text-slate-700">
+          <LaunchDateForm launchDate={launch.launch_date} canEdit={canEditLaunch} />
           <p>
             <span className="font-medium">Reporting cadence (computed):</span> {cadence}
           </p>
