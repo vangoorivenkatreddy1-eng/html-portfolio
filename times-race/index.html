@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Times Race</title>
+<style>
+:root{
+  /* Vangoori AI brand, made playful: cream page, navy ink, maroon accent, sunny gold for rewards. One app column, big tap targets. */
+  --navy:#1F2A5A; --maroon:#933B4D; --cream:#F5EDE0; --card:#FFFDF8;
+  --gold:#E8A93B; --good:#2E8B57; --line:#E4D8C4; --muted:#5B6280;
+  --display:Georgia, "Times New Roman", serif;
+  --body:system-ui, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--cream);color:var(--navy);font-family:var(--body);-webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:16px 16px 0}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.01em}
+.stars{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;background:var(--card);border:1.5px solid var(--line);border-radius:99px;padding:5px 12px;font-variant-numeric:tabular-nums}
+main{flex:1}
+h1{font-family:var(--display);font-weight:800;font-size:30px;line-height:1.1;margin:4px 0 6px;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0 0 10px}
+p.lead{color:var(--muted);margin:0 0 16px;font-size:15px;line-height:1.5}
+button{font-family:var(--body);cursor:pointer;color:var(--navy)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.name{display:flex;gap:8px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:16px}
+.name label{font-weight:600;font-size:14px;white-space:nowrap}
+.name input{flex:1;min-width:0;border:none;background:transparent;font:700 17px var(--body);color:var(--navy);padding:4px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{border:none;border-radius:18px;padding:18px 14px;text-align:left;min-height:124px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;box-shadow:0 3px 0 rgba(31,42,90,.18);transition:transform .08s}
+.mode:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(31,42,90,.18)}
+.mode b{font-family:var(--display);font-size:21px;line-height:1.1}
+.mode span{font-size:13px;font-weight:500;line-height:1.35}
+.m-learn{background:#E3E7F5}.m-practice{background:#F8E3C2}.m-race{background:var(--navy);color:#fff}.m-speed{background:var(--maroon);color:#fff}
+.m-board{grid-column:1/-1;min-height:auto;flex-direction:row;align-items:center;background:var(--card);border:1.5px solid var(--line);box-shadow:none}
+.mode .ico{width:34px;height:34px}
+.back{border:none;background:none;font:600 15px var(--body);padding:6px 0;margin-bottom:6px;display:inline-flex;gap:6px;align-items:center}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:12px 0;font:700 18px var(--body);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chip.wide{grid-column:span 5;font-size:15px}
+.table{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:6px 16px}
+.trow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.trow:last-child{border-bottom:none}
+.trow em{font-style:normal;color:var(--muted);font-weight:500;font-size:14px}
+.reveal{border:1.5px dashed var(--maroon);background:transparent;border-radius:10px;min-width:64px;padding:4px 10px;font:800 19px var(--body);color:var(--maroon)}
+.toggle{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
+.toggle button{border:1.5px solid var(--navy);background:transparent;border-radius:99px;padding:8px 14px;font:600 14px var(--body)}
+.qcard{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:18px 16px;text-align:center}
+.meta{display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:var(--muted);margin-bottom:8px;font-variant-numeric:tabular-nums}
+.q{font-family:var(--display);font-weight:800;font-size:32px;line-height:1.15;margin:8px 0 4px;text-wrap:balance}
+.q.big{font-size:44px;font-variant-numeric:tabular-nums}
+.hint{font-size:14px;color:var(--muted);min-height:20px;margin:0}
+.answer{margin:12px auto 4px;min-height:58px;width:min(220px,80%);border-bottom:3px solid var(--navy);font:800 40px var(--body);font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center}
+.answer.ok{color:var(--good);border-color:var(--good)}
+.answer.no{color:var(--maroon);border-color:var(--maroon);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.feedback{font-weight:700;min-height:24px;margin:6px 0 0;font-size:16px}
+.feedback.ok{color:var(--good)}.feedback.no{color:var(--maroon)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 4px}
+.pad button{border:none;background:var(--card);border-bottom:3px solid var(--line);border-radius:14px;padding:14px 0;font:700 24px var(--body);box-shadow:0 0 0 1.5px var(--line) inset}
+.pad button:active{transform:translateY(2px)}
+.pad .go{background:var(--navy);color:#fff;box-shadow:none;border-bottom-color:#0F1638}
+.pad .del{font-size:18px}
+.bar{height:10px;background:#E9DFCF;border-radius:99px;overflow:hidden;margin-bottom:8px}
+.bar span{display:block;height:100%;background:var(--gold);transition:width .25s linear}
+.bar.race span{background:var(--maroon)}
+.result{text-align:center;padding:10px 0}
+.result .score{font-family:var(--display);font-size:64px;font-weight:800;line-height:1;margin:6px 0;font-variant-numeric:tabular-nums}
+.bigstars{display:flex;justify-content:center;gap:8px;margin:10px 0}
+.bigstars svg{width:52px;height:52px}
+.cta{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.btn{border:none;border-radius:14px;padding:15px;font:700 17px var(--body);background:var(--navy);color:#fff;box-shadow:0 3px 0 #0F1638}
+.btn.alt{background:var(--card);color:var(--navy);box-shadow:0 0 0 1.5px var(--line) inset}
+.levels{display:grid;gap:10px}
+.level{border:1.5px solid var(--line);background:var(--card);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;text-align:left}
+.level b{font-size:17px;display:block}
+.level small{color:var(--muted);font-size:13px;font-weight:500}
+.level .best{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.board{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:4px 14px;margin-bottom:16px}
+.brow{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.brow:last-child{border-bottom:none}
+.brow .rk{font-weight:800;font-size:16px;text-align:center}
+.brow .nm{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.brow .nm small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+.brow .sc{font-weight:800;font-size:18px}
+.brow.me{background:#FBF1DC;margin:0 -14px;padding:10px 14px}
+.empty{color:var(--muted);font-size:14px;padding:14px 0;text-align:center}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5}
+footer{text-align:center;font-size:12px;color:var(--muted);padding:22px 0 18px;display:flex;flex-direction:column;align-items:center;gap:4px}
+footer .vg{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--navy)}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.8}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:360px){.q{font-size:27px}.q.big{font-size:36px}.chips{grid-template-columns:repeat(4,1fr)}.chip.wide{grid-column:span 4}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="14" fill="#1F2A5A"/><path d="M9 9l12 12M21 9L9 21" stroke="#F5EDE0" stroke-width="3.2" stroke-linecap="round"/><circle cx="23.5" cy="6.5" r="4" fill="#E8A93B"/></svg>
+      Times Race
+    </div>
+    <div class="stars" title="Stars earned"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="#E8A93B"/></svg><span id="starCount">0</span></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+  <footer>
+    <span class="vg"><svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 3h5l3 9 3-9h5l-6 15h-4z" fill="#1F2A5A"/><path d="M11.4 14.5 15 5h3l-5.2 13z" fill="#933B4D"/></svg>Made by Vangoori AI · Ideas into action</span>
+    <span>Rev 03 · Free, no ads, no sign-up. Scores stay on this device.</span>
+  </footer>
+</div>
+
+<script>
+/* ---------- storage (safe: artifact frames may block it) ---------- */
+const KEY='timesrace.v1';
+let mem={name:'',stars:0,race:[],speed:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object')mem=Object.assign(mem,s)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(mem))}catch(e){}}
+const $=s=>document.querySelector(s);
+const view=$('#view');
+function setStars(){$('#starCount').textContent=mem.stars}
+setStars();
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const nick=()=>(mem.name||'').trim()||'Player';
+
+/* ---------- words for "6 fours are how much?" ---------- */
+const ONES=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+function plural(n){const w=ONES[n];if(w==='six')return 'sixes';if(w.endsWith('y'))return w.slice(0,-1)+'ies';return w+'s'}
+function wordQ(a,b){return a===1?`1 ${ONES[b]} is how much?`:`${a} ${plural(b)} are how much?`}
+
+/* ---------- shared question engine with number pad ---------- */
+let timerId=null, keyHandler=null, pendingId=null;
+function stopAll(){clearInterval(timerId);timerId=null;clearTimeout(pendingId);pendingId=null;if(keyHandler){document.removeEventListener('keydown',keyHandler);keyHandler=null}}
+
+function quiz(opts){
+  // opts: {title, total, timeLimit(sec)|null, make():{text,big,ans}, onDone(stats), barClass, penalty}
+  stopAll();
+  const st={i:0,correct:0,streak:0,best:0,score:0,start:performance.now(),penalty:0,paused:0,locked:false,input:''};
+  let cur=opts.make();
+  view.innerHTML=`
+   <button class="back" id="quit">← Home</button>
+   <div class="bar ${opts.barClass||''}"><span id="bar" style="width:${opts.timeLimit?100:0}%"></span></div>
+   <div class="qcard">
+     <div class="meta"><span id="left"></span><span id="right"></span></div>
+     <div class="q" id="qtext"></div>
+     <p class="hint" id="hint"></p>
+     <div class="answer" id="ans" aria-label="Your answer"></div>
+     <p class="feedback" id="fb"></p>
+   </div>
+   <div class="pad" id="pad">
+     ${[1,2,3,4,5,6,7,8,9].map(n=>`<button type="button" data-k="${n}">${n}</button>`).join('')}
+     <button type="button" class="del" data-k="del" aria-label="Delete">⌫</button>
+     <button type="button" data-k="0">0</button>
+     <button type="button" class="go" data-k="ok" aria-label="Check answer">✓</button>
+   </div>`;
+  $('#quit').onclick=()=>{done=true;stopAll();home()};
+  const ans=$('#ans'),fb=$('#fb');
+  function paint(){
+    $('#qtext').textContent=cur.text;$('#qtext').className='q'+(cur.big?' big':'');
+    $('#hint').textContent=cur.hint||'';
+    ans.textContent=st.input;ans.className='answer';
+    $('#right').textContent=opts.timeLimit?`Score ${st.score}`:`${st.correct} correct`;
+    if(!opts.timeLimit){$('#left').textContent=`Question ${st.i+1} of ${opts.total}`;$('#bar').style.width=(st.i/opts.total*100)+'%'}
+  }
+  function press(k){
+    if(st.locked)return;
+    if(k==='del'){st.input=st.input.slice(0,-1)}
+    else if(k==='ok'){if(st.input!=='')check();return}
+    else if(st.input.length<6){st.input=(st.input==='0'?'':st.input)+k}
+    ans.textContent=st.input;
+  }
+  function check(){
+    const right=Number(st.input)===cur.ans;
+    st.locked=true;
+    if(right){
+      st.correct++;st.streak++;st.best=Math.max(st.best,st.streak);
+      st.score+=10+(st.streak>=3?5:0);
+      ans.className='answer ok';fb.className='feedback ok';
+      fb.textContent=st.streak>=3?`Correct! ${st.streak} in a row, +5 bonus`:pick(['Correct!','Super!','Well done!','Yes!']);
+    }else{
+      st.streak=0;st.penalty+=opts.penalty||0;
+      ans.className='answer no';fb.className='feedback no';
+      fb.textContent=`Almost! ${cur.show} = ${cur.ans}`+(opts.penalty?` (+${opts.penalty}s)`:'');
+    }
+    const pause=right?550:1300;
+    pendingId=setTimeout(()=>{
+      pendingId=null;st.paused+=pause;
+      if(done)return;
+      st.i++;fb.textContent='';fb.className='feedback';st.input='';st.locked=false;
+      if(!opts.timeLimit&&st.i>=opts.total){finish();return}
+      let next;do{next=opts.make()}while(next.text===cur.text);cur=next;paint();
+    },pause);
+  }
+  let done=false;
+  function finish(){if(done)return;done=true;stopAll();const secs=(performance.now()-st.start-st.paused)/1000;opts.onDone({...st,secs,total:opts.timeLimit?st.i:opts.total})}
+  $('#pad').onclick=e=>{const b=e.target.closest('button');if(b)press(b.dataset.k)};
+  keyHandler=e=>{if(e.target&&e.target.id==='nm')return;if(/^[0-9]$/.test(e.key)){e.preventDefault();press(e.key)}else if(e.key==='Backspace'){e.preventDefault();press('del')}else if(e.key==='Enter'||e.key===' '){e.preventDefault();if(e.key==='Enter')press('ok')}};
+  document.addEventListener('keydown',keyHandler);
+  if(opts.timeLimit){
+    const tick=()=>{const left=Math.max(0,opts.timeLimit-(performance.now()-st.start)/1000);
+      $('#left').textContent=`${Math.ceil(left)}s left`;$('#bar').style.width=(left/opts.timeLimit*100)+'%';
+      if(left<=0)finish()};
+    tick();timerId=setInterval(tick,200);
+  }else{
+    timerId=setInterval(()=>{if(opts.showClock)$('#right').textContent=`${((performance.now()-st.start-st.paused)/1000+st.penalty).toFixed(1)}s`},100);
+  }
+  paint();
+}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ---------- screens ---------- */
+const ICON={
+ learn:'<svg class="ico" viewBox="0 0 34 34" aria-hidden="true"><rect x="5" y="6" width="24" height="22" rx="4" fill="#1F2A5A"/><path d="M10 13h14M10 18h14M10 23h9" stroke="#F5EDE0" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ practice:'<svg class="ico" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="12" fill="#933B4D"/><path d="M12 17.5l3.5 3.5 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ race:'<svg class="ico" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="19" r="11" fill="none" stroke="#E8A93B" stroke-width="3"/><path d="M17 19V13M14 5h6" stroke="#E8A93B" stroke-width="3" stroke-linecap="round"/></svg>',
+ speed:'<svg class="ico" viewBox="0 0 34 34" aria-hidden="true"><path d="M19 4L8 19h8l-2 11 12-16h-8z" fill="#E8A93B"/></svg>',
+ board:'<svg class="ico" viewBox="0 0 34 34" aria-hidden="true"><rect x="4" y="16" width="7" height="13" rx="2" fill="#933B4D"/><rect x="13.5" y="8" width="7" height="21" rx="2" fill="#E8A93B"/><rect x="23" y="12" width="7" height="17" rx="2" fill="#1F2A5A"/></svg>'
+};
+
+function home(){
+  stopAll();
+  view.innerHTML=`
+   <h1>Ready, ${esc(nick())}?</h1>
+   <p class="lead">Learn your tables, then race the clock. Every right answer makes you faster.</p>
+   <div class="name"><label for="nm">Your nickname</label><input id="nm" maxlength="14" placeholder="Type a nickname" value="${esc(mem.name)}" autocomplete="off"></div>
+   <div class="modes">
+     <button class="mode m-learn" data-go="learn">${ICON.learn}<b>Learn</b><span>See any table from 2 to 20</span></button>
+     <button class="mode m-practice" data-go="practice">${ICON.practice}<b>Practice</b><span>Tables quiz, like 8 × 4</span></button>
+     <button class="mode m-race" data-go="race">${ICON.race}<b>Race</b><span>60 seconds. How many can you get?</span></button>
+     <button class="mode m-speed" data-go="speed">${ICON.speed}<b>Speed rounds</b><span>2-digit and 3-digit times questions</span></button>
+     <button class="mode m-board" data-go="board">${ICON.board}<b>Leaderboard</b><span>&nbsp;Top 10 racers on this device</span></button>
+   </div>`;
+  const nm=$('#nm');
+  nm.oninput=()=>{const c=nm.value.replace(/[<>]/g,'').slice(0,14);if(c!==nm.value)nm.value=c;mem.name=c;save();$('h1').textContent=`Ready, ${nick()}?`};
+  view.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>({learn,practice:practiceSetup,race:raceIntro,speed:speedSetup,board})[b.dataset.go]());
+}
+
+function tablePicker(sel,extra){
+  let h='';for(let n=2;n<=20;n++)h+=`<button class="chip" data-n="${n}" aria-pressed="${n===sel}">${n}</button>`;
+  if(extra)h+=`<button class="chip wide" data-n="mix" aria-pressed="${sel==='mix'}">Mixed 2 to 12</button>`;
+  return `<div class="chips" id="chips">${h}</div>`;
+}
+
+function learn(n=2,hide=false){
+  stopAll();
+  let rows='';for(let a=1;a<=10;a++){rows+=`<div class="trow"><span>${n} × ${a}</span>${hide?`<button class="reveal" data-v="${n*a}">?</button>`:`<span>${n*a}</span>`}</div>`}
+  view.innerHTML=`<button class="back" id="b">← Home</button><h2>Table of ${n}</h2>${tablePicker(n,false)}
+   <div class="toggle"><span class="note">${hide?'Tap each ? to check yourself.':'Read it aloud, then test yourself.'}</span><button id="t">${hide?'Show answers':'Hide answers'}</button></div>
+   <div class="table">${rows}</div>`;
+  $('#b').onclick=home;
+  $('#t').onclick=()=>learn(n,!hide);
+  $('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b)learn(+b.dataset.n,hide)};
+  view.querySelectorAll('.reveal').forEach(b=>b.onclick=()=>{b.textContent=b.dataset.v;b.style.borderStyle='solid'});
+}
+
+function practiceSetup(sel=2){
+  stopAll();
+  view.innerHTML=`<button class="back" id="b">← Home</button><h2>Practice</h2><p class="lead">Pick a table. You get 10 questions from that table, like 8 × 4.</p>
+   ${tablePicker(sel,true)}<div class="cta"><button class="btn" id="go">Start 10 questions</button></div>`;
+  $('#b').onclick=home;
+  $('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b)practiceSetup(b.dataset.n==='mix'?'mix':+b.dataset.n)};
+  $('#go').onclick=()=>quiz({
+    total:10,
+    make:()=>{const b=sel==='mix'?rnd(2,12):sel,a=rnd(1,10);return {text:`${b} × ${a}`,big:true,ans:a*b,show:`${b} × ${a}`}},
+    onDone:s=>{const st=s.correct>=9?3:s.correct>=7?2:s.correct>=5?1:0;mem.stars+=st;save();setStars();
+      result({title:st===3?'Brilliant!':st>=1?'Good work!':'Keep practising!',big:`${s.correct}/10`,sub:`Table ${sel==='mix'?'mixed':sel}`,stars:st,again:()=>practiceSetup(sel)})}
+  });
+}
+
+function raceIntro(){
+  stopAll();
+  view.innerHTML=`<button class="back" id="b">← Home</button><h2>Race</h2>
+   <p class="lead">You have 60 seconds. Tables from 2 to 12. Every right answer is 10 points, and 3 in a row gives a +5 bonus each time.</p>
+   <div class="cta"><button class="btn" id="go">Go, ${esc(nick())}!</button></div>`;
+  $('#b').onclick=home;
+  $('#go').onclick=()=>quiz({
+    timeLimit:60,barClass:'race',
+    make:()=>{const a=rnd(2,12),b=rnd(2,10);return {text:`${a} × ${b}`,big:true,ans:a*b,show:`${a} × ${b}`}},
+    onDone:s=>{
+      const entry={n:nick(),s:s.score,c:s.correct,d:new Date().toISOString().slice(0,10),id:Date.now()};
+      mem.race=[...(mem.race||[]),entry].sort((x,y)=>y.s-x.s||x.id-y.id).slice(0,10);
+      const rank=mem.race.findIndex(r=>r.id===entry.id)+1;
+      const st=s.correct>=20?3:s.correct>=12?2:s.correct>=6?1:0;mem.stars+=st;save();setStars();
+      result({title:rank===1&&s.score>0?'New top score!':'Time up!',big:s.score,sub:`${s.correct} correct · best streak ${s.best}${rank?` · rank #${rank} on this device`:''}`,stars:st,again:raceIntro,board:entry.id,celebrate:rank===1&&s.score>0});
+    }
+  });
+}
+
+const LEVELS=[
+ {id:'2x1',name:'2-digit × 1-digit',eg:'e.g. 47 × 6',a:[10,99],b:[2,9]},
+ {id:'2x2',name:'2-digit × 2-digit',eg:'e.g. 34 × 21',a:[10,99],b:[10,99]},
+ {id:'3x1',name:'3-digit × 1-digit',eg:'e.g. 256 × 7',a:[100,999],b:[2,9]},
+ {id:'3x2',name:'3-digit × 2-digit',eg:'e.g. 412 × 23',a:[100,999],b:[10,99]}
+];
+function speedSetup(){
+  stopAll();
+  view.innerHTML=`<button class="back" id="b">← Home</button><h2>Speed rounds</h2>
+   <p class="lead">10 questions against the clock. A wrong answer adds 5 seconds. Paper and pencil allowed!</p>
+   <div class="levels">${LEVELS.map(L=>{const b=mem.speed&&mem.speed[L.id];return `<button class="level" data-l="${L.id}"><span><b>${L.name}</b><small>${L.eg}</small></span><span class="best">${Number(b)>0?'Best '+Number(b).toFixed(1)+'s':'Not tried'}</span></button>`}).join('')}</div>`;
+  $('#b').onclick=home;
+  view.querySelectorAll('.level').forEach(btn=>btn.onclick=()=>{
+    const L=LEVELS.find(x=>x.id===btn.dataset.l);
+    quiz({total:10,penalty:5,showClock:true,
+      make:()=>{const a=rnd(...L.a),b=rnd(...L.b);return {text:`${a} × ${b}`,big:true,ans:a*b,show:`${a} × ${b}`}},
+      onDone:s=>{
+        const t=s.secs+s.penalty;mem.speed=mem.speed||{};
+        const prev=Number(mem.speed[L.id])||0;const isBest=s.correct>=8&&(!prev||t<prev);
+        if(isBest)mem.speed[L.id]=t;
+        const st=s.correct===10?3:s.correct>=8?2:s.correct>=5?1:0;mem.stars+=st;save();setStars();
+        result({title:isBest?'New best time!':'Round complete',big:`${t.toFixed(1)}s`,sub:`${L.name} · ${s.correct}/10 correct${s.correct<8?' · get 8+ right to set a best time':''}`,stars:st,again:speedSetup,celebrate:isBest});
+      }});
+  });
+}
+
+function boardHTML(hl){
+  const r=mem.race||[];
+  if(!r.length)return '<div class="board"><div class="empty">No races yet. Be the first!</div></div>';
+  return `<div class="board">${r.map((x,i)=>`<div class="brow${x.id===hl?' me':''}"><span class="rk">${i===0?'1st':i===1?'2nd':i===2?'3rd':i+1}</span><span class="nm">${esc(x.n)}<small>${x.c} correct · ${x.d}</small></span><span class="sc">${x.s}</span></div>`).join('')}</div>`;
+}
+function board(){
+  stopAll();
+  view.innerHTML=`<button class="back" id="b">← Home</button><h2>Leaderboard</h2>
+   <p class="lead">Top 10 Race scores on this device. Brothers, sisters and parents can all play here.</p>
+   ${boardHTML()}
+   <h2>Best speed times</h2>
+   <div class="board">${LEVELS.map(L=>`<div class="brow"><span class="rk"></span><span class="nm">${L.name}</span><span class="sc">${mem.speed&&Number(mem.speed[L.id])>0?Number(mem.speed[L.id]).toFixed(1)+'s':'—'}</span></div>`).join('')}</div>
+   <div class="cta"><button class="btn alt" id="clr">Clear scores on this device</button></div><div id="confirm"></div>`;
+  $('#b').onclick=home;
+  $('#clr').onclick=()=>{$('#confirm').innerHTML=`<div class="cta"><p class="note" style="text-align:center;margin:0">Delete all scores and stars on this device?</p><button class="btn" id="yes" style="background:var(--maroon);box-shadow:none">Yes, clear everything</button><button class="btn alt" id="no">No, keep them</button></div>`;
+    $('#yes').onclick=()=>{mem.race=[];mem.speed={};mem.stars=0;save();setStars();board()};$('#no').onclick=()=>{$('#confirm').innerHTML=''}};
+}
+
+const STAR=on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="${on?'#E8A93B':'#E4D8C4'}"/></svg>`;
+function result(o){
+  stopAll();
+  view.innerHTML=`<div class="result"><h1>${esc(o.title)}</h1><div class="score">${o.big}</div><p class="lead" style="margin:0">${esc(o.sub)}</p>
+   <div class="bigstars" aria-label="${o.stars} of 3 stars">${STAR(o.stars>=1)}${STAR(o.stars>=2)}${STAR(o.stars>=3)}</div></div>
+   ${o.board!==undefined?boardHTML(o.board):''}
+   <div class="cta"><button class="btn" id="ag">Play again</button><button class="btn alt" id="hm">Home</button></div>`;
+  $('#ag').onclick=o.again;$('#hm').onclick=home;
+  if(o.celebrate||o.stars===3)confetti();
+}
+function confetti(){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=document.createElement('div');c.className='confetti';const cols=['#1F2A5A','#933B4D','#E8A93B','#2E8B57'];
+  for(let i=0;i<60;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.background=cols[i%4];p.style.animationDelay=Math.random()*.5+'s';c.appendChild(p)}
+  document.body.appendChild(c);setTimeout(()=>c.remove(),2400);
+}
+home();
+</script>
+</body>
+</html>
