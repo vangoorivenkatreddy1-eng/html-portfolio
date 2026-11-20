@@ -1,0 +1,41 @@
+-- Production membership template (NOT for DEMO transactional seed)
+--
+-- 1. Create users in Supabase Auth (Dashboard → Authentication → Users)
+-- 2. Replace placeholder UUIDs below with each user's auth.users.id
+-- 3. Run against your project after migrations + optional seed.sql (DEMO launch only in non-prod)
+
+-- Example launch id when using bundled DEMO launch (non-production only):
+--   aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+
+/*
+-- Three executives (read + approvals)
+insert into public.launch_memberships (
+  launch_id, profile_id, role, assigned_domains,
+  can_approve_budget, can_approve_reports
+) values
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'EXECUTIVE_1_USER_UUID', 'executive', '{}', true, true),
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'EXECUTIVE_2_USER_UUID', 'executive', '{}', false, true),
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'EXECUTIVE_3_USER_UUID', 'executive', '{}', true, false);
+
+-- PMO Admin
+insert into public.launch_memberships (
+  launch_id, profile_id, role, assigned_domains,
+  can_approve_budget, can_approve_reports
+) values
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'PMO_ADMIN_USER_UUID', 'pmo_admin', '{}', true, true);
+
+-- Department editors (domain arrays enforced in RLS)
+insert into public.launch_memberships (
+  launch_id, profile_id, role, assigned_domains,
+  can_approve_budget, can_approve_reports
+) values
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'STAKEHOLDER_EDITOR_UUID', 'department_editor',
+   array['stakeholders']::public.domain_area[], false, false),
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'TRAVEL_EDITOR_UUID', 'department_editor',
+   array['travel','hotels','transport']::public.domain_area[], false, false),
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'BUDGET_EDITOR_UUID', 'department_editor',
+   array['budget_procurement']::public.domain_area[], false, false);
+*/
+
+-- Verify membership (run as authenticated user in SQL editor with JWT, or via app):
+-- select * from public.launch_memberships where profile_id = auth.uid();
